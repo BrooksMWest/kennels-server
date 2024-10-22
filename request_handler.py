@@ -1,5 +1,5 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from views import get_all_animals, get_single_animal
+from views import get_all_animals, get_single_animal, get_all_locations, get_single_location, get_all_employees, get_single_employee, get_all_customers, get_single_customer, create_animal, create_location, create_employee, create_customer, delete_animal, delete_customer, delete_employee, delete_location
 import json
 # Here's a class. It inherits from another class.
 # For now, think of a class as a container for functions that
@@ -73,25 +73,90 @@ class HandleRequests(BaseHTTPRequestHandler):
             else:
                 response = get_all_animals()
 
+        elif resource == "locations":
+            if id is not None:
+                response = get_single_location(id)
+
+            else:
+                response = get_all_locations()
+
+        elif resource == "employees":
+            if id is not None:
+                response = get_single_employee(id)
+
+            else:
+                response = get_all_employees()
+
+        elif resource == "customers":
+            if id is not None:
+                response = get_single_customer(id)
+
+            else:
+                response = get_all_customers()
+
         self.wfile.write(json.dumps(response).encode())
 
     # Here's a method on the class that overrides the parent's method.
     # It handles any POST request.
     def do_POST(self):
-        """Handles POST requests to the server
-        """
-        # Set response code to 'Created'
         self._set_headers(201)
-
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
-        response = f"received post request:<br>{post_body}"
-        self.wfile.write(response.encode())
 
+        # Convert JSON string to a Python dictionary
+        post_body = json.loads(post_body)
+
+        # Parse the URL
+        (resource, id) = self.parse_url(self.path)
+
+        # Initialize new animal
+        new_object = None
+
+        # Add a new animal to the list. Don't worry about
+        # the orange squiggle, you'll define the create_animal
+        # function next.
+        if resource == "animals":
+            new_object = create_animal(post_body)
+
+        elif resource == "locations":
+            new_object = create_location(post_body)
+
+        elif resource == "employees":
+            new_object = create_employee(post_body)
+
+        elif resource == "customers":
+            new_object = create_customer(post_body)
+
+        # Encode the new animal and send in response
+        if new_object:
+            self.wfile.write(json.dumps(new_object).encode())
     # Here's a method on the class that overrides the parent's method.
     # It handles any PUT request.
 
-    def do_PUT(self):
+    def do_DELETE(self):
+    # Set a 204 response code
+        self._set_headers(204)
+
+    # Parse the URL
+        (resource, id) = self.parse_url(self.path)
+
+    # Delete a single animal from the list
+        if resource == "animals":
+            delete_animal(id)
+
+        elif resource == "customers":
+            delete_customer(id)
+
+        elif resource == "employees":
+            delete_employee(id)
+
+        elif resource == "locations":
+            delete_location(id)
+
+    # Encode the new animal and send in response
+        self.wfile.write("".encode()) 
+
+def do_PUT(self):
         """Handles PUT requests to the server
         """
         self.do_POST()
