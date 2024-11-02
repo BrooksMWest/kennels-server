@@ -68,6 +68,29 @@ SELECT
     a.location_id,
     a.customer_id
 FROM animal a
-WHERE a.id = 31
+WHERE a.status = 
 
 SELECT id, name, address, email, password FROM customer;
+
+SELECT
+    c.id,
+    c.name,
+    c.address,
+    c.email,
+    c.password
+FROM customer c
+WHERE c.email = "mo@silvera.com"
+
+SELECT
+            c.id,
+            c.name,
+            c.breed,
+            c.status,
+            c.location_id,
+            c.customer_id    
+        FROM animal c
+        WHERE c.status = ?
+
+INSERT INTO `Animal` VALUES (null, "Sugar", "Kennel", "Boxer", 2, 2);
+
+INSERT INTO `Employee` VALUES (null, "Joey NutZo", "1313 Trumbull Lane", 3);
