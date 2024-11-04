@@ -76,9 +76,9 @@ class HandleRequests(BaseHTTPRequestHandler):
             if resource == "locations":
                 if id is not None:
                     response = get_single_location(id)
-
                 else:
                     response = get_all_locations()
+
             if resource == "employees":
                 if id is not None:
                     response = get_single_employee(id)
@@ -171,7 +171,6 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.wfile.write("".encode()) 
 
     def do_PUT(self):
-        self._set_headers(204)
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
         post_body = json.loads(post_body)
@@ -179,21 +178,28 @@ class HandleRequests(BaseHTTPRequestHandler):
     # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
-    # Delete a single animal from the list
+    # Initialize success as False by default
+        success = False
+
+    # Update the corresponding resource based on the URL path
         if resource == "animals":
-            update_animal(id, post_body)
-
+            success = update_animal(id, post_body)
         elif resource == "customers":
-            update_customer(id, post_body)
-
+            success = update_customer(id, post_body)
         elif resource == "employees":
-            update_employee(id, post_body)
-
+            success = update_employee(id, post_body)
         elif resource == "locations":
-            update_location(id, post_body)
+            success = update_location(id, post_body)
 
-    # Encode the new animal and send in response
-            self.wfile.write("".encode())
+    # Set appropriate headers based on success
+        if success:
+            self._set_headers(204)  # No Content for successful update
+        else:
+            self._set_headers(404)  # Not Found if the update fails
+
+    # Send an empty response body
+        self.wfile.write("".encode())
+
 
 # This function is not inside the class. It is the starting
 # point of this application.

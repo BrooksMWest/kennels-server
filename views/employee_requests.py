@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Employee
+from models import Employee, Location
 EMPLOYEES = [
     {
         "id": 1,
@@ -36,10 +36,14 @@ def get_all_employees():
         db_cursor.execute("""
         SELECT
             a.id,
-            a.name
-            a.address
-            a.location_id
+            a.name,
+            a.address,
+            a.location_id,
+            l.name location_name,
+            l.address location_address          
         FROM employee a
+        JOIN location l
+            ON l.id = a.location_id
         """)
 
         # Initialize an empty list to hold all animal representations
@@ -55,9 +59,13 @@ def get_all_employees():
             # Note that the database fields are specified in
             # exact order of the parameters defined in the
             # Animal class above.
-            customer = Employee(row['id'], row['name'])
+            employee = Employee(row['id'], row['name'], row['address'], row['location_id'])
 
-            employees.append(customer.__dict__) # see the notes below for an explanation on this line of code.
+            location = Location(row['id'], row['location_name'], row['location_address'])
+
+            employee.location = location.__dict__
+
+            employees.append(employee.__dict__) # see the notes below for an explanation on this line of code.
 
     return employees
 
@@ -72,7 +80,9 @@ def get_single_employee(id):
         db_cursor.execute("""
         SELECT
             a.id,
-            a.name
+            a.name,
+            a.address,
+            a.location_id
         FROM employee a
         WHERE a.id = ?
         """, ( id, ))
@@ -81,25 +91,26 @@ def get_single_employee(id):
         data = db_cursor.fetchone()
 
         # Create an animal instance from the current row
-        employee = Employee(data['id'], data['name'])
+        employee = Employee(data['id'], data['name'], data['address'], data['location_id'])
 
         return employee.__dict__
 
-def create_employee(employee):
-    # Get the id value of the last animal in the list
-    max_id = EMPLOYEES[-1]["id"]
+def create_employee(new_employee):
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        db_cursor = conn.cursor()
 
-    # Add 1 to whatever that number is
-    new_id = max_id + 1
+        db_cursor.execute("""
+        INSERT INTO Employee
+            ( name, address, location_id )
+        VALUES (?, ?, ?)
+        """, (new_employee['name'], new_employee['address'], new_employee['location_id']))
 
-    # Add an `id` property to the animal dictionary
-    employee["id"] = new_id
+        id = db_cursor.lastrowid
+        # Set the new employee's ID based on the last insert
+        new_employee['id'] = id
 
-    # Add the animal dictionary to the list
-    EMPLOYEES.append(employee)
+    return new_employee
 
-    # Return the dictionary with `id` property added
-    return employee
 
 def delete_employee(id):
     with sqlite3.connect("./kennel.sqlite3") as conn:

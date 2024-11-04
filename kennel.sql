@@ -94,3 +94,77 @@ SELECT
 INSERT INTO `Animal` VALUES (null, "Sugar", "Kennel", "Boxer", 2, 2);
 
 INSERT INTO `Employee` VALUES (null, "Joey NutZo", "1313 Trumbull Lane", 3);
+
+SELECT * FROM employee
+
+SELECT
+    a.id,
+    a.name,
+    a.breed,
+    a.status,
+    a.location_id,
+    a.customer_id,
+    l.name location_name,
+    l.address location_address
+FROM Animal a
+JOIN Location l
+    ON l.id = a.location_id
+
+SELECT
+            a.id,
+            a.name,
+            a.breed,
+            a.status,
+            a.location_id,
+            a.customer_id,
+            l.name location_name,
+            l.address location_address,
+            c.name customer_name,
+            c.address customer_address,
+            c.email customer_email,
+            c.password customer_password
+        FROM Animal a
+        JOIN Location l
+            ON l.id = a.location_id
+        JOIN Customer c
+            ON c.id = a.customer_id
+
+SELECT
+            a.id,
+            a.name,
+            a.address,
+            e.id employee_id,
+            e.name employee_name,
+            e.address employee_address,
+            e.location_id employee_location_id,
+            b.id animal_id,
+            b.name animal_name,
+            b.breed animal_breed,
+            b.status animal_status,
+            b.location_id animal_location_id,
+            b.customer_id animal_customer_id                           
+        FROM Location a
+        JOIN Employee e
+            ON e.location_id = a.id
+        JOIN Animal b
+            ON b.location_id = a.id
+
+SELECT
+            a.id,
+            a.name,
+            a.address,
+            e.id employee_id,
+            e.name employee_name,
+            e.address employee_address,
+            e.location_id employee_location_id,
+            b.id animal_id,
+            b.name animal_name,
+            b.breed animal_breed,
+            b.status animal_status,
+            b.location_id animal_location_id,
+            b.customer_id animal_customer_id                           
+        FROM Location a
+        JOIN Employee e
+            ON e.location_id = a.id
+        JOIN Animal b
+            ON b.location_id = a.id

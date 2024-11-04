@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Location
+from models import Location, Employee, Animal
 LOCATIONS = [
     {
         "id": 1,
@@ -27,8 +27,22 @@ def get_all_locations():
         SELECT
             a.id,
             a.name,
-            a.address              
-        FROM location a
+            a.address,
+            e.id employee_id,
+            e.name employee_name,
+            e.address employee_address,
+            e.location_id employee_location_id,
+            b.id animal_id,
+            b.name animal_name,
+            b.breed animal_breed,
+            b.status animal_status,
+            b.location_id animal_location_id,
+            b.customer_id animal_customer_id                           
+        FROM Location a
+        JOIN Employee e
+            ON e.location_id = a.id
+        JOIN Animal b
+            ON b.location_id = a.id
         """)
 
         # Initialize an empty list to hold all animal representations
@@ -45,6 +59,15 @@ def get_all_locations():
             # exact order of the parameters defined in the
             # Animal class above.
             location = Location(row['id'], row['name'], row['address'])
+
+            employee = Employee(row['employee_id'], row['employee_name'], row['employee_address'], row['employee_location_id'])
+            
+            animal = Animal(row['animal_id'], row['animal_name'], row['animal_breed'], row['animal_status'],
+                            row['animal_location_id'], row['animal_customer_id'])
+
+            location.employee = employee.__dict__
+
+            location.animal = animal.__dict__
 
             locations.append(location.__dict__) # see the notes below for an explanation on this line of code.
 
@@ -73,7 +96,8 @@ def get_single_location(id):
         # Create an animal instance from the current row
         location = Location(data['id'], data['name'], data['address'])
 
-        return location.__dict__
+        location.__dict__
+
 
 def create_location(location):
     # Get the id value of the last animal in the list
